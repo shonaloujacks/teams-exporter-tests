@@ -31,7 +31,6 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
-    storageState: "./LoginAuth.json",
   },
 
   /* Configure projects for major browsers */
@@ -40,7 +39,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        headless: false,
+        headless: true,
       },
     },
 
