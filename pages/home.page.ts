@@ -3,13 +3,40 @@ import fs from "fs";
 
 class HomePage {
   readonly page: Page;
+  chatLabel: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    this.chatLabel = page.getByRole("button").filter({
+      has: page.locator(".MuiTypography-root.MuiTypography-body2.css-15b8szy"),
+    });
   }
 
   async navigate() {
     await this.page.goto("https://app.teamsexporter.com/");
+  }
+
+  async checkOneOnOneLabel() {
+    let chatLabelCount = await this.chatLabel.count();
+    // Loop through and check only 1:1 chats are visible
+    for (let i = 0; i < chatLabelCount; i++) {
+      const element = this.chatLabel.nth(i);
+      const labelText = await element.textContent();
+      console.log("this is label text:", labelText);
+      expect(labelText).toContain("1:1");
+    }
+  }
+
+  async checkGroupLabel() {
+    // Recount number of chats
+    let chatLabelCount = await this.chatLabel.count();
+    // Loop through and check only Group chats are visible
+    for (let i = 0; i < chatLabelCount; i++) {
+      const element = this.chatLabel.nth(i);
+      const labelText = await element.textContent();
+      console.log("this is label text:", labelText);
+      expect(labelText).toContain("Group");
+    }
   }
 
   async updateSessionStorage() {

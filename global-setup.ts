@@ -28,16 +28,13 @@ async function globalSetup() {
   const chatButton = page.getByRole("button", { name: "My Chats" });
   await expect(chatButton).toBeVisible();
 
-  // Fetch session storage from page context
+  // Fetch session storage (containing tokens) from page context
   const sessionStorageJSON = await page.evaluate(() =>
     JSON.stringify(sessionStorage)
   );
 
   // Write the session storage to a new file
   fs.writeFileSync("session-storage.json", sessionStorageJSON);
-
-  //Save the state of the logged-in web page
-  // await page.context().storageState({ path: "./session-storage.json" });
 
   await browser.close();
 }

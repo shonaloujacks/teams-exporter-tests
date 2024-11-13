@@ -1,26 +1,28 @@
 import { test, expect } from "@playwright/test";
 import HomePage from "../pages/home.page";
 
-test("Test filter buttons", async ({ page }) => {
-  const homePage = new HomePage(page);
-  // Update session storage
-  homePage.updateSessionStorage();
-  // Go to to homepage
-  await homePage.navigate();
+test.describe("Homepage", () => {
+  test("Test filter buttons", async ({ page }) => {
+    const homePage = new HomePage(page);
 
-  //Click 1:1 chat button
-  await page.getByLabel("one on one chats").click();
+    // Update session storage
+    homePage.updateSessionStorage();
 
-  // // Check only 1:1 chats are visible
-  // const chatLabel1 = page.getByRole("paragraph", { name: "1:1" });
+    // Go to to homepage
+    await homePage.navigate();
 
-  // expect(chatLabel1).toBeVisible();
+    //Click 1:1 chat button
+    await page.getByLabel("one on one chats").click();
 
-  // // Click group chat button
-  // await page.getByLabel("group chats").click();
+    // Loop through and check only 1:1 chats are visible
+    await homePage.checkOneOnOneLabel();
 
-  // //Check only 1:1 chats are visible
-  // const chatLabel2 = page.getByRole("paragraph", { name: "Group" });
+    // Click group chat button
+    await page.getByLabel("group chats").click();
 
-  // expect(chatLabel2).toBeVisible();
+    // Loop through and check only Group chats are visible
+    await homePage.checkGroupLabel();
+  });
+
+  test("Test that export pdf button opens in new tab", async ({ page }) => {});
 });
