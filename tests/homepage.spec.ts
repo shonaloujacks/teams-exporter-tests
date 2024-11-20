@@ -23,7 +23,7 @@ test.describe("Homepage", () => {
     await homePage.checkGroupLabel();
   });
 
-  test.only("Test user search function", async ({ page }) => {
+  test("Test user search function", async ({ page }) => {
     const homePage = new HomePage(page);
     // Update session storage
     homePage.updateSessionStorage();
@@ -47,5 +47,33 @@ test.describe("Homepage", () => {
 
     // Check count is equal to 1
     expect(chatLabelCount).toEqual(1);
+  });
+
+  test("Test members dropdown appears on group chats", async ({ page }) => {
+    const homePage = new HomePage(page);
+    // Update session storage
+    homePage.updateSessionStorage();
+
+    // Go to to homepage
+    await homePage.navigate();
+
+    const chatList = page.getByRole("button").filter({
+      has: page.locator(".MuiAccordionSummary-content"),
+    });
+
+    const chatListCount = await chatList.count();
+
+    // Loop through list of chats and check that for items with text label Group, the expand Icon is present. For items with text label 1:1, make sure it is not present
+    for (let i = 0; i < chatListCount; i++) {
+      const element = chatList.nth(i);
+      const chatListText = await element.textContent();
+      const expandIcon = element.getByTestId("ExpandMoreIcon"); // scope expandIcon to current element
+      console.log("this is chat list text", chatListText);
+      if (chatListText && chatListText.toLowerCase().includes("group")) {
+        await expect(expandIcon).toBeVisible();
+      } else if (chatListText && chatListText.toLowerCase().includes("1:1")) {
+        await expect(expandIcon).not.toBeVisible();
+      }
+    }
   });
 });
