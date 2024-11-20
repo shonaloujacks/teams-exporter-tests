@@ -4,7 +4,6 @@ import HomePage from "../pages/home.page";
 test.describe("Homepage", () => {
   test("Test filter buttons", async ({ page }) => {
     const homePage = new HomePage(page);
-
     // Update session storage
     homePage.updateSessionStorage();
 
@@ -24,5 +23,29 @@ test.describe("Homepage", () => {
     await homePage.checkGroupLabel();
   });
 
-  test("Test that export pdf button opens in new tab", async ({ page }) => {});
+  test.only("Test user search function", async ({ page }) => {
+    const homePage = new HomePage(page);
+    // Update session storage
+    homePage.updateSessionStorage();
+
+    // Go to to homepage
+    await homePage.navigate();
+
+    // Select search box
+    const searchBox = page.getByLabel(
+      "Search Chats or 'users: Alice, Bob' to filter by members"
+    );
+
+    // Fill search box
+    await searchBox.fill("users: Isaiah");
+
+    // Click enter
+    await page.keyboard.press("Enter");
+
+    // Count chats
+    const chatLabelCount = await homePage.chatLabel.count();
+
+    // Check count is equal to 1
+    expect(chatLabelCount).toEqual(1);
+  });
 });

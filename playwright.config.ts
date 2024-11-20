@@ -40,6 +40,9 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         headless: true,
+        launchOptions: {
+          slowMo: 2000, // Apply slow motion of 500ms for debugging
+        },
       },
     },
 

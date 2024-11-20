@@ -3,7 +3,7 @@ import fs from "fs";
 import { Context } from "vm";
 
 async function globalSetup() {
-  const browser: Browser = await chromium.launch({ headless: false });
+  const browser: Browser = await chromium.launch({ headless: true });
   const context: Context = await browser.newContext();
   const page: Page = await context.newPage();
 
@@ -25,7 +25,7 @@ async function globalSetup() {
   await popup.getByRole("button", { name: "Yes" }).click();
 
   // Verify signed-in state
-  const chatButton = page.getByRole("button", { name: "My Chats" });
+  const chatButton = page.getByRole("button", { name: "MY CHATS" });
   await expect(chatButton).toBeVisible();
 
   // Fetch session storage (containing tokens) from page context
