@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 import HomePage from "../pages/home.page";
+import { url } from "inspector";
 
 test.describe("Homepage", () => {
-  test("Test filter buttons", async ({ page }) => {
+  test("Test group and 1:1 filter buttons", async ({ page }) => {
     const homePage = new HomePage(page);
     // Update session storage
     homePage.updateSessionStorage();
@@ -31,13 +32,8 @@ test.describe("Homepage", () => {
     // Go to to homepage
     await homePage.navigate();
 
-    // Select search box
-    const searchBox = page.getByLabel(
-      "Search Chats or 'users: Alice, Bob' to filter by members"
-    );
-
     // Fill search box
-    await searchBox.fill("users: Isaiah");
+    await homePage.searchBox.fill("users: Isaiah");
 
     // Click enter
     await page.keyboard.press("Enter");
@@ -57,23 +53,27 @@ test.describe("Homepage", () => {
     // Go to to homepage
     await homePage.navigate();
 
-    const chatList = page.getByRole("button").filter({
-      has: page.locator(".MuiAccordionSummary-content"),
-    });
+    // Check that for items with text label Group, the expand Icon is present and that for those with label 1:1, it is not
+    await homePage.checkExpandIcon();
+  });
 
-    const chatListCount = await chatList.count();
+  test("Test log out flow", async ({ page }) => {
+    const homePage = new HomePage(page);
+    // Update session storage
+    homePage.updateSessionStorage();
 
-    // Loop through list of chats and check that for items with text label Group, the expand Icon is present. For items with text label 1:1, make sure it is not present
-    for (let i = 0; i < chatListCount; i++) {
-      const element = chatList.nth(i);
-      const chatListText = await element.textContent();
-      const expandIcon = element.getByTestId("ExpandMoreIcon"); // scope expandIcon to current element
-      console.log("this is chat list text", chatListText);
-      if (chatListText && chatListText.toLowerCase().includes("group")) {
-        await expect(expandIcon).toBeVisible();
-      } else if (chatListText && chatListText.toLowerCase().includes("1:1")) {
-        await expect(expandIcon).not.toBeVisible();
-      }
-    }
+    // Go to to homepage
+    await homePage.navigate();
+
+    // Click to open settings
+    await homePage.settingsButton.click();
+
+    // Click log out
+    await homePage.logoutButton.click();
+
+    // Check for sign-out text
+    await expect(homePage.pageBody).toHaveText(
+      /You signed out of your account/i
+    );
   });
 });

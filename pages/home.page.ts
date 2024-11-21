@@ -4,12 +4,26 @@ import fs from "fs";
 class HomePage {
   readonly page: Page;
   chatLabel: Locator;
+  searchBox: Locator;
+  chatList: Locator;
+  settingsButton: Locator;
+  logoutButton: Locator;
+  pageBody: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.chatLabel = page.getByRole("button").filter({
       has: page.locator(".MuiTypography-root.MuiTypography-body2.css-15b8szy"),
     });
+    this.searchBox = page.getByLabel(
+      "Search Chats or 'users: Alice, Bob' to filter by members"
+    );
+    this.chatList = page.getByRole("button").filter({
+      has: page.locator(".MuiAccordionSummary-content"),
+    });
+    this.settingsButton = page.getByRole("button", { name: /open settings/i });
+    this.logoutButton = page.getByText(/logout/i);
+    this.pageBody = page.locator("body");
   }
 
   async navigate() {
@@ -36,6 +50,24 @@ class HomePage {
       const labelText = await element.textContent();
       console.log("this is label text:", labelText);
       expect(labelText).toContain("Group");
+    }
+  }
+
+  async checkExpandIcon() {
+    const chatListCount = await this.chatList.count();
+    // Loop through list of chats
+    for (let i = 0; i < chatListCount; i++) {
+      const element = this.chatList.nth(i);
+      const chatListText = await element.textContent();
+      const expandIcon = element.getByTestId("ExpandMoreIcon"); // scope expandIcon to current element
+      console.log("this is chat list text", chatListText);
+      // Check that for items with text label Group, the expand Icon is present
+      if (chatListText && chatListText.toLowerCase().includes("group")) {
+        await expect(expandIcon).toBeVisible();
+        // Check that for items with text label 1:1, the expand Icon is not present
+      } else if (chatListText && chatListText.toLowerCase().includes("1:1")) {
+        await expect(expandIcon).not.toBeVisible();
+      }
     }
   }
 
